@@ -187,7 +187,7 @@ addEventListener('pointercancel',()=>{if(drag&&drag.gh)drag.gh.remove();drag=nul
 function takeFrom(c,pk){if(!S||S.turn!==S.you||S.phase!=='draw'||S.over||pickSel)return;
  if(c==='drawdiscard'&&!S.discard){err='El descarte está vacío: no se puede robar de ahí';return render()}
  pickSel=pk;cmd(c);render()}
-const topbar=()=>`<div class="top"><span class="ttl">1000 hitos</span><small>Sala ${S.code}</small><span style="margin-left:auto"></span><button class="ib ${mute?'off':''}" title="Efectos de sonido" aria-label="Efectos de sonido" onclick="mu()">${mute?'🔇':'🔊'}</button><button class="ib ${musicOn&&!mfail?'':'off'}" title="${mfail?'Falta public/musica.mp3':'Música'}" aria-label="Música" onclick="mus()">🎵</button><button class="ib" style="font-weight:700" aria-label="Guía de cartas" onclick="help(1)">?</button></div>`;
+const topbar=()=>`<div class="top"><span class="ttl">1000 hitos</span><small>Sala ${S.code}</small><span style="margin-left:auto"></span><button class="ib ${mute?'off':''}" title="Efectos de sonido" aria-label="Efectos de sonido" onclick="mu()">${mute?'🔇':'🔊'}</button><button class="ib ${musicOn&&!mfail?'':'off'}" title="${mfail?'Falta public/musica.mp3':'Música'}" aria-label="Música" onclick="mus()">🎵</button><button class="ib" title="Salir de la sala" aria-label="Salir de la sala" onclick="if(confirm('¿Salir de la sala? Se termina la partida en curso.'))leave()">🚪</button><button class="ib" style="font-weight:700" aria-label="Guía de cartas" onclick="help(1)">?</button></div>`;
 function musicSync(){const want=musicOn&&!mfail&&gest&&S&&S.started;
  if(!want){if(au&&!au.paused)au.pause();return}
  if(!au){au=new Audio('/musica.mp3');au.loop=true;au.volume=.3;au.preload='none';au.addEventListener('error',()=>{mfail=true;render()})}
