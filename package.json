@@ -1,0 +1,1 @@
+{"name":"1000-hitos","version":"1.0.0","private":true,"scripts":{"start":"node server/index.js","test":"node --test tests/rules.test.js"},"engines":{"node":">=18"},"dependencies":{"ws":"^8.18.0"}}

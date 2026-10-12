@@ -1,0 +1,90 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>1000 Hitos</title>
+<style>
+:root{--ink:#222;--paper:#fbf6e6;--bg:#efe6c8;--red:#d62828;--grn:#2e9e4f;--yel:#f4c430;--blu:#1d9bd1}
+*{box-sizing:border-box}html,body{margin:0;overflow-x:hidden}
+body{background:var(--bg);color:var(--ink);font:16px/1.4 Georgia,'Times New Roman',serif}
+main{max-width:780px;margin:0 auto;padding:12px}
+h1{font-size:44px;letter-spacing:3px;text-align:center;margin:18px 0 4px;border-bottom:6px double var(--ink)}
+h1 span{color:var(--red)}
+.box{background:var(--paper);border:2px solid var(--ink);border-radius:8px;padding:12px;margin:10px 0}
+button,input{font:inherit;padding:10px 14px;border:2px solid var(--ink);border-radius:6px;background:#fff;min-height:44px}
+button{background:var(--yel);font-weight:700;cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}
+button.sec{background:#fff}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.err{color:var(--red);font-weight:700;min-height:1.4em}.small{font-size:14px;color:#555}
+.turn{border-left:8px solid var(--red);padding:6px 10px;font-weight:700;background:var(--paper);border-top:2px solid var(--ink);border-bottom:2px solid var(--ink)}
+.turn.me{border-left-color:var(--grn)}
+.bar{height:14px;border:2px solid var(--ink);background:#fff;border-radius:7px;overflow:hidden}.bar i{display:block;height:100%;background:var(--grn)}
+.shields{display:flex;gap:6px;min-height:50px;margin-top:6px}.shields .card{width:36px;height:52px;border-width:1px}.shields .t{display:none}
+.stat{font-weight:700;margin:6px 0}.stat.bad{color:var(--red)}
+.piles{display:flex;gap:16px;justify-content:center;align-items:center}
+.card{width:84px;height:124px;background:var(--paper);border:2px solid var(--ink);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:4px;flex:0 0 auto;position:relative;cursor:pointer;user-select:none}
+.card svg{width:100%;flex:1;min-height:0}.card .n{font:700 30px/1 Georgia}.card .inv{transform:rotate(180deg)}
+.card .t{font:700 10px/1.1 Georgia;text-align:center;text-transform:uppercase;width:100%;color:#fff;padding:2px;border-radius:3px}
+.haz .t{background:var(--red)}.rem .t{background:var(--grn)}.shd .t{background:var(--blu)}
+.card.back{background:repeating-linear-gradient(45deg,var(--red) 0 6px,var(--paper) 6px 12px);border-width:4px}
+.hand{display:flex;gap:8px;overflow-x:auto;padding:14px 4px 8px}
+.hand .card.sel{transform:translateY(-10px);box-shadow:0 0 0 3px var(--blu)}.hand .card.no{opacity:.55}
+.msg{min-height:44px}
+</style></head><body><main id="app"></main>
+<script>
+const NAME={accident:'Accidente',gas:'Sin carburante',flat:'Neumático pinchado',stop:'Semáforo rojo · Alto',limit:'Límite de velocidad',repair:'Reparaciones',fuel:'Gasolina',spare:'Neumático de repuesto',go:'Semáforo verde',endlimit:'Fin de límite',ace:'As del volante',tank:'Tanque extra',punct:'A prueba de pinchazos',right:'Prioridad de paso'};
+const HAZ=['accident','gas','flat','stop','limit'],SHD=['ace','tank','punct','right'];
+const STAT={start:'Sin arrancar · necesitas semáforo verde',go:'En marcha',accident:'Accidente · necesitas reparaciones',gas:'Sin carburante · necesitas gasolina',flat:'Neumático pinchado · necesitas neumático de repuesto',stop:'Semáforo rojo · necesitas semáforo verde'};
+const tire='<circle cx="30" cy="30" r="21" fill="#222"/><circle cx="30" cy="30" r="9" fill="#fbf6e6"/>';
+const pump=c=>`<rect x="14" y="10" width="26" height="40" fill="${c}"/><rect x="19" y="15" width="16" height="12" fill="#fbf6e6"/><path d="M40 20h8v22" stroke="#222" stroke-width="3" fill="none"/>`;
+const shield=l=>`<path d="M30 6L52 14V32C52 44 42 52 30 56C18 52 8 44 8 32V14Z" fill="#1d9bd1" stroke="#222" stroke-width="2"/><text x="30" y="40" font-size="26" font-weight="700" text-anchor="middle" fill="#fff">${l}</text>`;
+const G={go:'<circle cx="30" cy="30" r="20" fill="#2e9e4f" stroke="#222" stroke-width="2"/>',stop:'<circle cx="30" cy="30" r="20" fill="#d62828" stroke="#222" stroke-width="2"/>',
+limit:'<circle cx="30" cy="30" r="20" fill="#fff" stroke="#d62828" stroke-width="6"/><text x="30" y="38" font-size="22" font-weight="700" text-anchor="middle">50</text>',
+endlimit:'<circle cx="30" cy="30" r="20" fill="#fff" stroke="#222" stroke-width="3"/><path d="M14 46L46 14" stroke="#222" stroke-width="4"/>',
+accident:'<rect x="6" y="26" width="28" height="16" fill="#d62828" transform="rotate(-12 20 34)"/><rect x="28" y="20" width="28" height="16" fill="#1d9bd1" transform="rotate(14 42 28)"/>',
+gas:pump('#d62828'),fuel:pump('#2e9e4f'),flat:tire+'<path d="M8 8L52 52" stroke="#d62828" stroke-width="5"/>',spare:tire+'<circle cx="30" cy="30" r="25" fill="none" stroke="#2e9e4f" stroke-width="4"/>',
+repair:'<rect x="8" y="26" width="44" height="9" fill="#555" transform="rotate(-35 30 30)"/><circle cx="14" cy="44" r="8" fill="#f4c430" stroke="#222" stroke-width="2"/>',
+ace:shield('A'),tank:shield('T'),punct:shield('P'),right:shield('★')};
+function card(c){const k=c.k;
+ if(k[0]==='d'){const v=k.slice(1);return `<div class="card dist" data-id="${c.id}"><b class="n">${v}</b><svg viewBox="0 0 60 60"><rect x="4" y="14" width="18" height="32" fill="#2e9e4f"/><path d="M38 14A16 16 0 0 1 38 46Z" fill="#d62828"/><circle cx="26" cy="30" r="14" fill="#f4c430" stroke="#222" stroke-width="2"/><circle cx="22" cy="27" r="2"/><circle cx="30" cy="27" r="2"/></svg><b class="n inv">${v}</b></div>`}
+ const cls=HAZ.includes(k)?'haz':SHD.includes(k)?'shd':'rem';
+ return `<div class="card ${cls}" data-id="${c.id}"><span class="t">${NAME[k]}</span><svg viewBox="0 0 60 60">${G[k]}</svg><span class="t inv">${NAME[k]}</span></div>`}
+let ws,S=null,sel=null,err='',name=localStorage.mhn||'';
+const ses=()=>{try{return JSON.parse(localStorage.mh)}catch{return null}};
+const send=o=>ws&&ws.readyState===1&&ws.send(JSON.stringify(o));
+function conn(){ws=new WebSocket((location.protocol==='https:'?'wss://':'ws://')+location.host);
+ ws.onopen=()=>{const s=ses(),h=location.hash.slice(1).toUpperCase();if(s&&(!h||h===s.code))send({type:'join',code:s.code,token:s.token,name})};
+ ws.onmessage=e=>{const m=JSON.parse(e.data);
+  if(m.type==='joined'){localStorage.mh=JSON.stringify({code:m.code,token:m.token});location.hash=m.code}
+  else if(m.type==='error'){err=m.msg;if(m.fatal){localStorage.removeItem('mh');S=null}}
+  else if(m.type==='state'){S=m.s;err='';if(S.rev!==undefined&&!(S.hand||[]).some(c=>c.id===sel))sel=null}
+  render()};
+ ws.onclose=()=>setTimeout(conn,2000)}
+window.setName=v=>{name=v.trim();localStorage.mhn=name};
+window.create=()=>send({type:'create',name});
+window.joinCode=()=>{const c=document.getElementById('cd').value.trim().toUpperCase();if(c)send({type:'join',code:c,name})};
+window.pick=id=>{sel=id;render()};
+window.cmd=(type,card)=>{send({type,card});sel=null};
+window.copy=()=>navigator.clipboard&&navigator.clipboard.writeText(location.origin+'/#'+S.code);
+window.leave=()=>{localStorage.removeItem('mh');location.hash='';S=null;render()};
+function home(){return `<h1>1000 <span>HITOS</span></h1><div class="box"><p>Juego de cartas clásico para dos jugadores, en línea. Crea una partida y comparte el enlace; gana quien llegue exactamente a 1.000 km.</p>
+<p><input placeholder="Tu nombre" value="${name}" onchange="setName(this.value)"></p>
+<p><button onclick="create()">Crear partida</button></p><p class="row"><input id="cd" placeholder="Código" maxlength="6" value="${location.hash.slice(1)}" style="width:120px;text-transform:uppercase"><button class="sec" onclick="joinCode()">Unirme con código</button></p><div class="err">${err}</div></div>`}
+function lobby(){const link=location.origin+'/#'+S.code;return `<h1>1000 <span>HITOS</span></h1><div class="box"><p>Código de sala: <b style="font-size:28px;letter-spacing:4px">${S.code}</b></p>
+<p class="small" style="word-break:break-all">${link}</p><p><button class="sec" onclick="copy()">Copiar enlace</button></p>
+${S.seats.map((s,i)=>`<p>Jugador ${i+1}: ${s?`<b>${s.name}</b> · ${s.connected?'conectado':'desconectado'}`:'esperando…'}${i===S.you?' (tú)':''}</p>`).join('')}
+${S.you===0?`<button ${S.seats[1]?'':'disabled'} onclick="send({type:'start'})">Empezar partida</button>`:'<p>Esperando a que el creador empiece…</p>'}<div class="err">${err}</div></div>`}
+function panel(i){const p=S.p[i],s=S.seats[i],me=i===S.you,bad=p.status!=='go';
+ return `<div class="box"><div class="row"><b>${me?'Tú':s.name}</b><span class="small">${me?'':(s.connected?'':'· desconectado')}</span><span style="margin-left:auto"><b>${p.km}</b> / 1000 km</span></div>
+ <div class="bar"><i style="width:${p.km/10}%"></i></div><div class="stat ${bad?'bad':''}">${STAT[p.status]}${p.limit?' · Límite de velocidad (solo 25/50 km)':''}</div>
+ <div class="shields">${p.shields.map(k=>card({k,id:'s'+k})).join('')}</div></div>`}
+function game(){const mine=S.turn===S.you;let h='<h1 style="font-size:30px">1000 <span>HITOS</span></h1>';
+ if(S.over){h+=`<div class="box"><h2>${S.winner===-1?'Empate':S.winner===S.you?'¡Has ganado!':'Ha ganado '+S.seats[S.winner].name}</h2><p>Distancia final: ${S.p.map((p,i)=>(i===S.you?'Tú':S.seats[i].name)+' '+p.km+' km').join(' · ')}</p><div class="row"><button onclick="send({type:'rematch'})">Revancha</button><button class="sec" onclick="copy()">Copiar enlace</button></div></div>`}
+ else h+=`<div class="turn ${mine?'me':''}">${mine?'Tu turno · '+(S.phase==='draw'?'roba una carta':'juega o descarta'):'Turno de '+S.seats[S.turn].name}</div>`;
+ h+=panel(1-S.you)+`<div class="piles"><div class="card back" ${mine&&S.phase==='draw'&&!S.over?'onclick="cmd(\'draw\')" style="outline:3px solid var(--blu)"':''}></div><div><b>Mazo: ${S.deck}</b><br>Descarte: ${S.discard}<br><span class="small">Cartas rival: ${S.p[1-S.you].hand}</span></div></div>`+panel(S.you);
+ h+=`<div class="msg">${S.coup?`<div class="box">Te han atacado y tienes el escudo: <button onclick="cmd('coup',${S.coup})">¡Jugada maestra!</button></div>`:S.msg||''}<span class="err">${err}</span></div>`;
+ h+=`<div class="hand">${S.hand.map(c=>card(c).replace('class="card','onclick="pick('+c.id+')" class="card '+(c.id===sel?'sel ':'')+(S.legal[c.id]?'no ':''))).join('')}</div>`;
+ if(sel!==null&&!S.over){const c=S.hand.find(c=>c.id===sel),r=S.legal[sel],can=mine&&S.phase==='play';
+  h+=`<div class="box row"><b>${NAME[c.k]||c.k.slice(1)+' km'}</b>${r?`<span class="small">${r}</span>`:''}<button ${r?'disabled':''} onclick="cmd('play',${sel})">Jugar</button><button class="sec" ${can?'':'disabled'} onclick="cmd('discard',${sel})">Descartar</button></div>`}
+ return h}
+function render(){const a=document.getElementById('app');
+ if(document.activeElement&&document.activeElement.tagName==='INPUT'&&!S)return;
+ a.innerHTML=!S?home():!S.started?lobby():game()}
+render();conn();
+</script></body></html>
