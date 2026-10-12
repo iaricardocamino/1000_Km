@@ -25,10 +25,12 @@ Alternativas equivalentes: Fly.io o Railway (mismo `npm start`; usan la variable
 
 ## Reglas implementadas y decisiones
 - 106 cartas con la composición del PDF; 6 cartas por jugador; robar, jugar o descartar.
-- Se arranca con Semáforo verde (o Prioridad de paso). Tras reparar otras averías no hace falta otro verde.
+- Se arranca con Semáforo verde (o Prioridad de paso). Tras reparar (reparaciones, gasolina o rueda) hace falta otro Libre, salvo con Vehículo prioritario.
 - Un bloqueo de conducción a la vez + límite de velocidad aparte. Averías solo contra rival en marcha (regla clásica).
-- Máximo dos 200 km; meta exacta en 1.000 km; la carrera acaba al instante.
+- Máximo dos 200 km; la carrera acaba al instante al llegar o superar 1.000 km.
 - Jugada maestra: tras recibir una avería, puedes jugar el escudo correspondiente **antes de robar en tu turno** (así el rival no ve tu mano); cancela la avería, repones carta y robas/juegas de nuevo. Decisión de diseño: no es en el mismo instante del ataque.
+- Al empezar el turno se roba del mazo o la última carta del descarte (variante pedida; no verificada contra las reglas originales). Esa carta superior del descarte no se baraja.
+- Fin de partida: Revancha, Volver al lobby o Salir (la sala se reorganiza si se va el creador). Colores fijos por asiento: rojo (creador) y azul.
 - Mazo agotado: se barajan descarte y cartas jugadas de nuevo, salvo la carta superior de los mazos de kilómetros, marcha y velocidad de cada jugador, los escudos en juego y las manos. Los kilómetros siguen contando aunque sus cartas se reciclen.
 - Escudo jugado con la avería ya activa: la retira. Descartes definitivos.
 

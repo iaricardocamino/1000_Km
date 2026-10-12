@@ -51,6 +51,13 @@ wss.on('connection', ws => {
     }
     const c = ws.ctx; if (!c) return;
     const { room, seat } = c; room.last = Date.now();
+    if (m.type === 'lobby') { room.g = null; return push(room); } // vuelve toda la sala al lobby
+    if (m.type === 'leave') { // el jugador sale; el otro queda en el lobby con opciones
+      room.seats[seat] = null; ws.ctx = null; room.g = null;
+      if (!room.seats[0] && room.seats[1]) { room.seats[0] = room.seats[1]; room.seats[1] = null; if (room.seats[0].ws) room.seats[0].ws.ctx = { room, seat: 0 }; }
+      if (!room.seats[0]) rooms.delete(room.code); else push(room);
+      return send(ws, { type: 'left' });
+    }
     if (m.type === 'start' || m.type === 'rematch') {
       const ok = m.type === 'start' ? !room.g && seat === 0 && room.seats[1] : room.g && room.g.over;
       if (!ok) return send(ws, { type: 'error', msg: 'No se puede empezar ahora' });

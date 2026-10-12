@@ -32,8 +32,7 @@ function why(g, seat, card) {
   const me = g.p[seat], rv = g.p[1 - seat], k = card.k;
   if (k[0] === 'd') {
     const v = +k.slice(1);
-    if (me.status !== 'go') return me.status === 'start' ? 'Necesitas un semáforo verde para arrancar' : 'Estás detenido: repara primero';
-    if (me.km + v > 1000) return 'Superarías los 1.000 km';
+    if (me.status !== 'go') return me.status === 'start' ? 'Necesitas un semáforo verde para arrancar' : me.status === 'rep' ? 'Ya está reparado: juega un Libre (verde) antes de avanzar' : 'Estás detenido: repara primero';
     if (me.limit && v > 50) return 'Límite de velocidad: solo 25 o 50 km';
     if (v === 200 && me.n200 >= 2) return 'Máximo dos cartas de 200 km';
     return null;
@@ -43,7 +42,7 @@ function why(g, seat, card) {
     if (k === 'limit') return rv.limit ? 'El rival ya tiene límite' : null;
     return rv.status === 'go' ? null : 'El rival no está en marcha';
   }
-  if (k === 'go') return ['start', 'stop'].includes(me.status) ? null : 'No lo necesitas ahora';
+  if (k === 'go') return ['start', 'stop', 'rep'].includes(me.status) ? null : 'No lo necesitas ahora';
   if (REMEDY_OF[k]) return me.status === REMEDY_OF[k] ? null : 'No tienes esa avería';
   if (k === 'endlimit') return me.limit ? null : 'No tienes límite de velocidad';
   return me.shields.includes(k) ? 'Ya has jugado este escudo' : null; // escudos
@@ -62,15 +61,15 @@ function coupCard(g, seat) {
 // de kilómetros, marcha y velocidad de cada jugador, los escudos en juego y las manos.
 function refill(g) {
   if (g.deck.length) return;
-  const pool = g.discard.splice(0);
+  const top = g.discard.pop(); const pool = g.discard.splice(0); if (top) g.discard.push(top);
   for (const p of g.p) for (const z of ['pk', 'pd', 'ps']) { const top = p[z].pop(); pool.push(...p[z]); p[z] = top ? [top] : []; }
   if (!pool.length) return;
   g.deck = shuffle(pool); g.shuf++; g.msg = 'Se acabó el mazo: barajando las cartas jugadas…';
 }
 function endTurn(g, seat) {
   refill(g);
-  g.turn = 1 - seat; g.phase = g.deck.length ? 'draw' : 'play';
-  if (!g.deck.length) { // mazo agotado: se sigue sin robar hasta quedarse sin cartas
+  g.turn = 1 - seat; g.phase = g.deck.length || g.discard.length ? 'draw' : 'play';
+  if (!g.deck.length && !g.discard.length) { // mazo agotado: se sigue sin robar hasta quedarse sin cartas
     if (!g.p[g.turn].hand.length) g.turn = seat;
     if (!g.p[0].hand.length && !g.p[1].hand.length) {
       g.over = true; const [a, b] = [g.p[0].km, g.p[1].km]; g.winner = a === b ? -1 : a > b ? 0 : 1;
@@ -91,9 +90,16 @@ function act(g, seat, type, cardId) {
     g.msg = '¡Jugada maestra! Avería cancelada y turno extra'; g.rev++; return null;
   }
   if (g.turn !== seat) return 'No es tu turno';
+  if (type === 'drawdiscard') {
+    if (g.phase !== 'draw') return 'Ya has robado';
+    if (!g.discard.length) return 'El descarte está vacío';
+    g.lastHazard = null; g.msg = ''; const c = g.discard.pop(); me.hand.push(c); g.phase = 'play';
+    g.last = { n: g.rev + 1, seat, k: c.k, t: 'takediscard' }; g.rev++; return null;
+  }
   if (type === 'draw') {
     if (g.phase !== 'draw') return 'Ya has robado';
-    g.lastHazard = null; refill(g); if (g.deck.length) me.hand.push(g.deck.pop()); else g.msg = 'No quedan cartas para robar'; g.phase = 'play'; g.rev++; return null;
+    const sh = g.shuf; refill(g); if (!g.deck.length) return 'El mazo está vacío: coge del descarte';
+    g.lastHazard = null; if (g.shuf === sh) g.msg = ''; me.hand.push(g.deck.pop()); g.phase = 'play'; g.rev++; return null;
   }
   if (g.phase !== 'play') return 'Primero roba una carta';
   const card = me.hand.find(c => c.id === cardId); if (!card) return 'Esa carta no es tuya';
@@ -104,16 +110,17 @@ function act(g, seat, type, cardId) {
     take(me, cardId); const k = card.k;
     if (k[0] === 'd') {
       const v = +k.slice(1); me.km += v; me.pk.push(card); if (v === 200) me.n200++;
-      if (me.km === 1000) { g.over = true; g.winner = seat; }
+      if (me.km >= 1000) { g.over = true; g.winner = seat; }
     } else if (HAZ.includes(k)) {
       if (k === 'limit') { rv.limit = true; rv.ps.push(card); } else { rv.status = k; rv.pd.push(card); }
       g.lastHazard = { victim: 1 - seat, k };
-    } else if (k === 'go' || REMEDY_OF[k]) { me.status = 'go'; me.pd.push(card); }
+    } else if (k === 'go') { me.status = 'go'; me.pd.push(card); }
+    else if (REMEDY_OF[k]) { me.status = me.shields.includes('right') ? 'go' : 'rep'; me.pd.push(card); } // tras reparar hace falta un Libre, salvo con Vehículo prioritario
     else if (k === 'endlimit') { me.limit = false; me.ps.push(card); }
     else { // escudo: protege y retira la avería asociada si ya estaba activa
       me.shields.push(k); me.sc.push(card);
-      if (k === 'right') { if (['start', 'stop'].includes(me.status)) me.status = 'go'; me.limit = false; }
-      else if (me.status === SHIELD_CURES[k]) me.status = 'go';
+      if (k === 'right') { if (['start', 'stop', 'rep'].includes(me.status)) me.status = 'go'; me.limit = false; }
+      else if (me.status === SHIELD_CURES[k]) me.status = me.shields.includes('right') ? 'go' : 'rep';
     }
   } else return 'Comando desconocido';
   g.last = { n: g.rev + 1, seat, k: card.k, t: type };
