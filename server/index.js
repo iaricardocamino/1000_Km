@@ -9,7 +9,20 @@ const ALPHA = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const code = () => Array.from({ length: 6 }, () => ALPHA[crypto.randomInt(ALPHA.length)]).join('');
 const clean = n => String(n || '').replace(/[<>&"']/g, '').trim().slice(0, 16);
 
+const MUSIC = path.join(__dirname, '../public/musica.mp3'); // el MP3 lo añade el usuario; si falta, responde 404
+function music(q, s) {
+  fs.stat(MUSIC, (e, st) => {
+    if (e || !st.isFile()) { s.writeHead(404); return s.end(); }
+    let a = 0, b = st.size - 1, code = 200; const r = /bytes=(\d*)-(\d*)/.exec(q.headers.range || '');
+    if (r && (r[1] || r[2])) { code = 206; if (r[1]) { a = +r[1]; if (r[2]) b = Math.min(+r[2], b); } else a = Math.max(0, st.size - +r[2]); }
+    if (a > b) { s.writeHead(416, { 'Content-Range': 'bytes */' + st.size }); return s.end(); }
+    const h = { 'Content-Type': 'audio/mpeg', 'Accept-Ranges': 'bytes', 'Content-Length': b - a + 1, 'Cache-Control': 'public, max-age=3600' };
+    if (code === 206) h['Content-Range'] = `bytes ${a}-${b}/${st.size}`;
+    s.writeHead(code, h); fs.createReadStream(MUSIC, { start: a, end: b }).on('error', () => s.destroy()).pipe(s);
+  });
+}
 const srv = http.createServer((q, s) => {
+  if (q.url.split('?')[0] === '/musica.mp3') return music(q, s);
   if (q.url === '/health') return s.end('ok');
   s.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); s.end(html);
 });

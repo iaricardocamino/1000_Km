@@ -25,7 +25,7 @@ button.s{background:#fff3;color:#fff;box-shadow:none}input{background:#fffef8;co
 .chip{padding:2px 10px;border-radius:99px;font-size:13px;font-weight:700;background:#fff3}.chip.go{background:var(--grn)}.chip.bad{background:var(--red)}.chip.w{background:#f2a516;color:var(--ink)}
 .km{margin-left:auto;font-size:22px;font-weight:700}.km small{font-size:12px;opacity:.7}
 .row{display:flex;gap:8px;justify-content:center;align-items:flex-start}
-.zw{display:grid;justify-items:center;gap:2px}.zl{font-size:11px;opacity:.75;white-space:nowrap}
+.zw{display:grid;justify-items:center;gap:2px}.zl{font-size:11px;opacity:.75;text-align:center;max-width:calc(var(--w)*1.5);line-height:1.1}.zl.hint{opacity:1;color:var(--lime);font-weight:700}
 .z{position:relative;width:var(--w);height:calc(var(--w)*1.42);border:2px dashed #fff4;border-radius:10px;transition:.15s}
 .z.sm{width:calc(var(--w)*.62);height:calc(var(--w)*.88)}.z.sm .card{transform:scale(.62);transform-origin:0 0}
 .z.wide{width:calc(var(--w)*1.9)}
@@ -62,21 +62,11 @@ button.s{background:#fff3;color:#fff;box-shadow:none}input{background:#fffef8;co
 .coup{background:var(--lime);color:var(--ink);animation:bob .8s infinite}
 .end{position:fixed;inset:0;background:#000a;display:grid;place-items:center;z-index:50}.end .panel{background:#143a36;animation:ld .6s}
 .dot{width:12px;height:12px;border-radius:50%;box-shadow:0 0 0 2px #fff;flex:none}.end[hidden]{display:none}.hp{width:min(560px,94vw);max-height:88dvh;overflow:auto;background:#143a36;border-radius:16px;padding:18px;line-height:1.35}.hp h3{margin:14px 0 4px;color:var(--lime)}.hp li{margin:6px 0;font-size:14.5px}.hp ul{padding-left:18px;margin:4px 0}.hp .x{position:sticky;top:0;float:right}
+.top{display:flex;align-items:center;gap:6px;min-height:38px}.top .ttl{font-weight:700;font-size:20px}.top small{opacity:.7}.ib{width:34px;height:34px;min-height:0;padding:0;border-radius:50%;background:#fff3;color:#fff;box-shadow:none;font-size:17px;line-height:1}.ib.off{opacity:.4}
+.z.off{opacity:.45}.z.pickd{background:#d4ec2f66!important;transform:scale(1.08)}
+.hg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px 10px}.hr{display:flex;gap:8px;align-items:center;font-size:13px;line-height:1.2}.hr .card{--cw:50px}.hkm{display:flex;gap:6px;flex-wrap:wrap}.hkm .card{--cw:46px}.hn{font-size:13px;opacity:.85;margin:6px 0}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-</style></head><body><main id="app"></main><div id="help" class="end" hidden onclick="if(event.target===this)help(0)"><div class="hp" role="dialog" aria-label="Ayuda"><button class="x" onclick="help(0)">Cerrar</button><h2 style="margin:0">Cómo se juega</h2>
-<h3>Objetivo</h3><p>Gana quien primero alcance <b>1.000 km o más</b>. No hace falta llegar justo: con 950 km, un 100 te da la victoria con 1.050. La carrera termina al instante. Solo suman las cartas de kilómetros.</p>
-<h3>Un turno</h3><ul><li>Robas una carta: <b>del mazo</b> o <b>la última del descarte</b> (el botón se desactiva si no hay descarte).</li><li>Juegas una carta válida o descartas una. Arrástrala al hueco iluminado, o toca la carta y luego el hueco.</li><li>Pasa el turno al rival.</li></ul>
-<h3>Cartas (106)</h3>
-<ul><li><b>Kilómetros</b>: 25 (×10), 50 (×10), 75 (×10), 100 (×12), 200 (×4). Solo con el Libre puesto. Máximo dos de 200 por jugador. Con límite de velocidad solo 25 o 50. Ejemplo: en marcha, juegas un 75 y avanzas 75 km.</li>
-<li><b>Libre</b> (×14, semáforo verde): necesario para arrancar, tras un Stop y tras cualquier reparación. Ejemplo: te reparan el pinchazo y aún falta un Libre.</li>
-<li><b>Ataques</b> (al rival en marcha): <b>Accidente</b> (×3), <b>Sin gasolina</b> (×3), <b>Pinchazo</b> (×3), <b>Stop</b> (×5). <b>Límite de velocidad</b> (×4) se puede jugar aunque el rival no esté en marcha, si no tiene ya uno. Ejemplo: el rival circula y le lanzas Pinchazo; queda parado.</li>
-<li><b>Remedios</b>: <b>Reparaciones</b> (×6) para Accidente, <b>Gasolina</b> (×6) para Sin gasolina, <b>Rueda de recambio</b> (×6) para Pinchazo, <b>Fin límite de velocidad</b> (×6) para el límite. Tras Accidente, Sin gasolina o Pinchazo debes jugar después un Libre. Tras Stop, el Libre es el remedio. Ejemplo: Pinchazo, Rueda de recambio, Libre y ya puedes avanzar.</li>
-<li><b>Escudos</b> (×1 cada uno, permanentes): <b>As del volante</b> contra Accidente, <b>Cisterna de gasolina</b> contra Sin gasolina, <b>Impinchable</b> contra Pinchazo, <b>Vehículo prioritario</b> contra Stop y Límite de velocidad; con él no necesitas Libre para arrancar ni tras reparar. Un escudo jugado con la avería activa la retira, y sin Vehículo prioritario aún necesitas un Libre. Ejemplo: con Impinchable en mesa, los Pinchazos del rival ya no te afectan.</li></ul>
-<h3>Reglas especiales</h3>
-<ul><li><b>Jugada maestra</b>: si el rival te lanza un ataque y tienes en la mano su escudo, al empezar tu turno, antes de robar, aparece «¡Jugada maestra!». Paso a paso: 1) el rival juega Pinchazo; 2) tú tienes Impinchable; 3) pulsas el botón: el escudo queda en mesa, el pinchazo se anula y sigues en marcha sin necesitar Libre; 4) repones una carta y haces tu turno normal (robar y jugar). Es opcional: si robas, ya no puedes hacerla. Aquí no hay puntuación, así que no suma puntos.</li>
-<li><b>Volver a circular</b>: Accidente, Sin gasolina o Pinchazo: remedio y después Libre. Stop: Libre. Con Vehículo prioritario en mesa no hace falta el Libre.</li>
-<li><b>Fin</b>: al alcanzar o superar 1.000 km.</li>
-<li><b>Mazo agotado</b>: se baraja el descarte (salvo su carta de arriba, que puedes coger) junto con las cartas jugadas en kilómetros, marcha y velocidad, salvo la superior de cada montón. Los escudos y las manos no se tocan. Si no queda ninguna carta para robar, se sigue jugando sin robar; al quedarse ambos sin cartas gana quien tenga más km.</li></ul></div></div>
+</style></head><body><main id="app"></main><div id="help" class="end" hidden onclick="if(event.target===this)help(0)"><div class="hp" role="dialog" aria-label="Guía de cartas"><button class="x" onclick="help(0)">Cerrar</button><h2 style="margin:0">Guía de cartas</h2><div id="hb"></div></div></div>
 <script>
 const C={r:'#e0312b',c:'#17a9cf',l:'#d4ec2f',k:'#1c1c1c',g:'#2fae5a'};
 const COL=['#e0312b','#2563eb'],CN=['rojo','azul'];
@@ -108,6 +98,7 @@ function face(k){if(k[0]==='d'){const v=k.slice(1),s=`style="color:${DC[v]}"`;re
 const seen=new Set();let seenInit=false;
 const cardEl=(c,cls='',st='')=>`<div class="card ${kind(c.k)} ${seen.has(c.id)||!seenInit?'':'land'} ${cls}" data-id="${c.id}" style="${st}">${face(c.k)}</div>`;
 const stk=(cs,f)=>cs.map((c,i)=>cardEl(c,'',f(i,cs.length))).join('');
+let pickSel=null,mfail=false,gest=false,au=null,musicOn=localStorage.mhmus!=='0';
 let ws,S=null,sel=null,err='',name=localStorage.mhn||'',drag=null,pend=false,mute=localStorage.mhm==='1';
 let AC;const bp=(f,t=.12)=>{if(mute)return;try{AC=AC||new AudioContext();const o=AC.createOscillator(),g=AC.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.1,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+t);o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+t)}catch{}};
 const ses=()=>{try{return JSON.parse(localStorage.mh)}catch{return null}};
@@ -118,8 +109,8 @@ function conn(){ws=new WebSocket((location.protocol==='https:'?'wss://':'ws://')
  ws.onmessage=e=>{const m=JSON.parse(e.data);
   if(m.type==='joined'){localStorage.mh=JSON.stringify({code:m.code,token:m.token});location.hash=m.code}
   else if(m.type==='left'){localStorage.removeItem('mh');S=null;sel=null;seenInit=false;location.hash=''}
-  else if(m.type==='error'){err=m.msg;if(m.fatal){localStorage.removeItem('mh');S=null}}
-  else if(m.type==='state'){S=m.s;err='';if(S.rev!==undefined&&!(S.hand||[]).some(c=>c.id===sel))sel=null;sfx()}
+  else if(m.type==='error'){pickSel=null;err=m.msg;if(m.fatal){localStorage.removeItem('mh');S=null}}
+  else if(m.type==='state'){S=m.s;err='';pickSel=null;if(S.rev!==undefined&&!(S.hand||[]).some(c=>c.id===sel))sel=null;sfx()}
   render()};
  ws.onclose=()=>setTimeout(conn,2000)}
 function sfx(){if(!S||!S.started)return;if(S.shuf>pShuf)bp(280,.4);pShuf=S.shuf;const L=S.last;if(!L)pLast=-1;
@@ -140,29 +131,29 @@ function home(){return `<div class="panel"><div class="logo">1000 <b>hitos</b></
 function lobby(){return `<div class="panel"><div class="logo">1000 <b>hitos</b></div><div>Código de sala</div><div class="code">${S.code}</div>
 <button class="s" onclick="copy()">Copiar enlace</button>${S.seats.map((s,i)=>`<div>${s?`<b>${esc(s.name)}</b>${i===S.you?' (tú)':''} · ${s.connected?'conectado':'desconectado'}`:'Esperando jugador…'}</div>`).join('')}
 ${S.you===0?`<button ${S.seats[1]?'':'disabled'} onclick="send({type:'start'})">Empezar partida</button>`:'<div>Esperando a que el creador empiece…</div>'}<button class="s" onclick="leave()">Salir de la sala</button><div class="err">${err}</div></div>`}
-const zone=(side,zn,label,inner,x='')=>`<div class="zw"><div class="z ${x}" data-zone="${zn}" data-side="${side}">${inner}</div><span class="zl">${label}</span></div>`;
+const zone=(side,zn,label,inner,x='')=>`<div class="zw"><div class="z ${x}" data-zone="${zn}" data-side="${side}">${inner}</div><span class="zl ${/must/.test(x)?'hint':''}">${label}</span></div>`;
 function carEl(i){return `<div class="car" data-i="${i}" style="left:${prevKm[i]}%"><svg viewBox="0 0 40 28">${car(COL[i])}</svg></div>`}
 function area(i){const p=S.p[i],me=i===S.you,s=S.seats[i],sd=me?'me':'rv',bad=p.status!=='go';
  const rot=(j,n)=>`transform:rotate(${(j-(n-1))*3}deg)`;
  return `<div class="area">${me?'':`<div class="ohand">${Array(p.hand).fill(0).map(()=>'<div class="card back mini"></div>').join('')}</div>`}
- <div class="ph"><i class="dot" style="background:${COL[i]}"></i><b>${me?'Tú':esc(s.name)}</b><small style="opacity:.75">${CN[i]}</small><span class="chip ${p.status==='go'?'go':p.status==='rep'||p.status==='start'?'w':'bad'}">${ST[p.status]}</span>${p.limit?'<span class="chip w">Máx. 50 km/h</span>':''}${!me&&!s.connected?'<span class="chip">desconectado</span>':''}<span class="km">${p.km}<small>/1000</small></span></div>
- <div class="row">${zone(sd,'km',p.n200?`Kilómetros · ${p.n200}×200`:'Kilómetros',stk(p.pk,j=>`left:${j*2-2}px;top:${-j*2-2}px`)+(p.km?`<span class="badge">${p.km}</span>`:''))}
+ <div class="ph"><i class="dot" style="background:${COL[i]}"></i><b>${me?'Tú':esc(s.name)}</b><small style="opacity:.75">${CN[i]}</small><span class="chip ${p.status==='go'?'go':p.status==='rep'||p.status==='start'?'w':'bad'}">${ST[p.status]}</span>${p.limit?'<span class="chip w">Máx. 50 km/h</span>':''}${!me&&!s.connected?'<span class="chip">desconectado</span>':''}<span class="km">${p.km}<small> / 1000 km</small></span></div>
+ <div class="row">${zone(sd,'km','Kilómetros',stk(p.pk,j=>`left:${j*2-2}px;top:${-j*2-2}px`)+(p.km?`<span class="badge">${p.km}</span>`:''))}
  ${zone(sd,'drive','Marcha',stk(p.pd,(j,n)=>rot(j,n)))}${zone(sd,'speed','Velocidad',stk(p.ps,()=>''),'sm')}${zone(sd,'shield','Escudos',stk(p.sc,j=>`left:calc(var(--w)*${j*.3} - 2px)`),'wide')}</div></div>`}
 function tick(){const L=S.last;let a='';
  if(L){const m=L.seat===S.you,w=m?'':esc(S.seats[L.seat].name),nm=NAME[L.k]||L.k.slice(1)+' km';
   a=L.t==='takediscard'?(m?'Coges ':w+' coge ')+nm+' del descarte':L.t==='discard'?(m?'Descartas ':w+' descarta ')+nm:L.t==='coup'?(m?'¡Jugada maestra tuya!':'¡'+w+' hace jugada maestra!'):L.k[0]==='d'?(m?'Avanzas ':w+' avanza ')+L.k.slice(1)+' km':HAZ.includes(L.k)?(m?'Lanzas '+nm:w+' te lanza '+nm):(m?'Juegas ':w+' juega ')+nm}
  const mine=S.turn===S.you;
- return `<div class="t1" style="${err?'color:#ff9a8f':''}">${err||S.msg||a}</div>${S.coup?`<button class="coup" onclick="cmd('coup',${S.coup})">¡Jugada maestra!</button>`:''}${mine&&S.phase==='draw'?`<div class="row"><button onclick="cmd('draw')">Robar del mazo</button><button class="s" ${S.discard?'':'disabled'} onclick="cmd('drawdiscard')">Coger descarte</button></div>`:''}<div class="t2 ${mine?'me':''}">${mine?(S.phase==='draw'?'Roba del mazo':'Juega o descarta'):'Turno de '+esc(S.seats[S.turn].name)+'…'}</div>`}
+ return `<div class="t1" style="${err?'color:#ff9a8f':''}">${err||S.msg||a}</div>${S.coup?`<button class="coup" onclick="cmd('coup',${S.coup})">¡Jugada maestra!</button>`:''}<div class="t2 ${mine?'me':''}">${mine?(S.phase==='draw'?(S.cd?'Reposición: roba una carta':'Roba una carta'):'Juega o descarta'):'Turno de '+esc(S.seats[S.turn].name)+'…'}</div>`}
 function game(){const mine=S.turn===S.you&&!S.over,dr=mine&&S.phase==='draw',n=S.hand.length,m=(n-1)/2,rv=S.p[1-S.you];
  const ids=[];S.p.forEach(p=>ids.push(...p.pk,...p.pd,...p.ps,...p.sc));ids.push(...S.hand);const flat=ids.map(c=>c.id).concat(S.dtop?[S.dtop.id]:[]);
  if(!seenInit){flat.forEach(i=>seen.add(i))}
- let h=`<div class="road"><div class="lane">${carEl(1-S.you)}${carEl(S.you)}</div></div>`;
+ let h=`${topbar()}<div class="road"><div class="lane">${carEl(1-S.you)}${carEl(S.you)}</div></div>`;
  h+=area(1-S.you);
- h+=`<div class="mid">${zone('me','deck',`Mazo · ${S.deck}`,(S.deck?`<div class="card back" style="left:-2px;top:-2px"></div><div class="card back" style="left:-4px;top:-4px"></div>`:'')+(S.deck?`<span class="badge">${S.deck}</span>`:''),`deckz ${dr?'must':''} ${S.shuf>pShuf-1&&S.msg?'shuf':''}`).replace('class="z ','data-deck="1" class="z ')}
- <div class="tick">${tick()}</div>${zone('me','discard',`Descarte · ${S.discard}`,S.dtop?cardEl(S.dtop,'','transform:rotate(-5deg)'):'')}</div>`;
+ h+=`<div class="mid">${zone('me','deck',dr?'Puedes robar de aquí':`Mazo · ${S.deck}`,(S.deck?`<div class="card back" style="left:-2px;top:-2px"></div><div class="card back" style="left:-4px;top:-4px"></div>`:'')+(S.deck?`<span class="badge">${S.deck}</span>`:''),`deckz ${dr?'must':''} ${pickSel==='deck'?'pickd':''} ${S.shuf>pShuf-1&&S.msg?'shuf':''}`).replace('class="z ','data-deck="1" class="z ')}
+ <div class="tick">${tick()}</div>${zone('me','discard',dr?(S.discard?'Puedes robar la última carta':'Descarte vacío: no disponible'):`Descarte · ${S.discard}`,(S.dtop?cardEl(S.dtop,'','transform:rotate(-5deg)'):'')+(S.discard?`<span class="badge">${S.discard}</span>`:''),dr?(S.discard?`must ${pickSel==='disc'?'pickd':''}`:'off'):'')}</div>`;
  h+=area(S.you);
  h+=`<div class="hand">${S.hand.map((c,i)=>cardEl(c,(c.id===sel?'sel ':'')+(mine&&S.phase==='play'&&S.legal[c.id]?'dim':''),`--r:${(i-m)*4}deg;--y:${Math.abs(i-m)*3}px`)).join('')}</div>`;
- h+=`<div class="row" style="padding-top:2px"><button class="s" style="min-height:32px;padding:4px 12px" onclick="mu()">${mute?'🔇 Sonido':'🔊 Sonido'}</button><span style="opacity:.6;align-self:center;font-size:12px">Sala ${S.code}</span><button class="s" aria-label="Ayuda" style="min-height:32px;width:32px;padding:0;border-radius:50%" onclick="help(1)">?</button></div>`;
+ 
  if(S.over)h+=`<div class="end"><div class="panel"><div class="logo">${S.winner===-1?'Empate':S.winner===S.you?'¡Has ganado!':'Gana '+esc(S.seats[S.winner].name)}</div><div>${S.p.map((p,i)=>(i===S.you?'Tú':esc(S.seats[i].name))+' '+p.km+' km').join(' · ')}</div><button onclick="again()">Revancha</button><button class="s" onclick="tolobby()">Volver al lobby</button><button class="s" onclick="leave()">Salir del juego</button></div></div>`;
  seenInit=true;setTimeout(()=>{seen.clear();flat.forEach(i=>seen.add(i))},700);return h}
 function hl(){document.querySelectorAll('[data-zone]').forEach(z=>{z.classList.remove('ok','no');if(sel===null||!S)return;const c=S.hand.find(c=>c.id===sel);if(!c)return;const d=dest(c.k),zn=z.dataset.zone;
@@ -172,7 +163,7 @@ function render(){if(drag&&drag.moved){pend=true;return}
  const a=document.getElementById('app');if(document.activeElement&&document.activeElement.tagName==='INPUT'&&!S)return;
  a.innerHTML=!S?home():!S.started?lobby():game();
  if(S&&S.started)document.querySelectorAll('.car').forEach(c=>{const i=+c.dataset.i;requestAnimationFrame(()=>requestAnimationFrame(()=>{c.style.left=Math.min(100,S.p[i].km/10)+'%'}));prevKm[i]=Math.min(100,S.p[i].km/10)});
- hl()}
+ hl();musicSync()}
 function tryPlay(id,z){const c=S.hand.find(c=>c.id===id);if(!c||S.over)return;const d=dest(c.k),zn=z.dataset.zone;
  if(zn==='discard'){if(S.turn!==S.you)err='No es tu turno';else if(S.phase!=='play')err='Primero roba una carta';else return cmd('discard',id)}
  else if(zn===d.zone&&z.dataset.side===d.side){if(!S.legal[id])return cmd('play',id);err=S.legal[id]}
@@ -188,11 +179,29 @@ addEventListener('pointerup',e=>{const z=zoneAt(e);
  if(drag&&drag.moved){drag.gh.remove();const id=drag.id;drag=null;pend=false;if(z)tryPlay(id,z);else{sel=null;render()}return}
  const hc=e.target.closest('.hand .card');drag=null;
  if(hc){const id=+hc.dataset.id;sel=sel===id?null:id;err='';return render()}
- if(z&&z.dataset.deck){if(S&&S.turn===S.you&&S.phase==='draw'&&!S.over)cmd('draw');return}
- if(e.target.closest('[data-deck]')&&S&&S.turn===S.you&&S.phase==='draw'&&!S.over)return cmd('draw');
- if(z&&z.dataset.zone==='discard'&&sel===null&&S&&S.turn===S.you&&S.phase==='draw'&&S.discard&&!S.over)return cmd('drawdiscard');
+ if(z&&z.dataset.deck){takeFrom('draw','deck');return}
+ if(e.target.closest('[data-deck]'))return takeFrom('draw','deck');
+ if(z&&z.dataset.zone==='discard'&&sel===null&&S&&S.phase==='draw')return takeFrom('drawdiscard','disc');
  if(sel!==null&&z)tryPlay(sel,z)});
 addEventListener('pointercancel',()=>{if(drag&&drag.gh)drag.gh.remove();drag=null;sel=null;render()});
+function takeFrom(c,pk){if(!S||S.turn!==S.you||S.phase!=='draw'||S.over||pickSel)return;
+ if(c==='drawdiscard'&&!S.discard){err='El descarte está vacío: no se puede robar de ahí';return render()}
+ pickSel=pk;cmd(c);render()}
+const topbar=()=>`<div class="top"><span class="ttl">1000 hitos</span><small>Sala ${S.code}</small><span style="margin-left:auto"></span><button class="ib ${mute?'off':''}" title="Efectos de sonido" aria-label="Efectos de sonido" onclick="mu()">${mute?'🔇':'🔊'}</button><button class="ib ${musicOn&&!mfail?'':'off'}" title="${mfail?'Falta public/musica.mp3':'Música'}" aria-label="Música" onclick="mus()">🎵</button><button class="ib" style="font-weight:700" aria-label="Guía de cartas" onclick="help(1)">?</button></div>`;
+function musicSync(){const want=musicOn&&!mfail&&gest&&S&&S.started;
+ if(!want){if(au&&!au.paused)au.pause();return}
+ if(!au){au=new Audio('/musica.mp3');au.loop=true;au.volume=.3;au.preload='none';au.addEventListener('error',()=>{mfail=true;render()})}
+ if(au.paused)au.play().catch(e=>{if(e&&e.name==='NotSupportedError'){mfail=true;render()}})}
+window.mus=()=>{musicOn=!musicOn;localStorage.mhmus=musicOn?'1':'0';gest=true;if(mfail){mfail=false;au=null}musicSync();render()};
+['pointerdown','pointerup','click','keydown'].forEach(t=>addEventListener(t,()=>{if(!gest){gest=true;musicSync()}},{passive:true}));
+function buildHelp(){const row=(k,t)=>`<div class="hr">${cardEl({id:'h'+k,k})}<span>${t}</span></div>`,grp=(t,a)=>`<h3>${t}</h3><div class="hg">${a.map(x=>row(...x)).join('')}</div>`;
+ document.getElementById('hb').innerHTML=`<h3 style="margin-top:6px">Kilómetros</h3><div class="hkm">${['d25','d50','d75','d100','d200'].map(k=>cardEl({id:'h'+k,k})).join('')}</div><p class="hn">Suman kilómetros. Hace falta el Libre; con límite, solo 25 o 50. Con 1.000 km o más ganas.</p>`
+ +grp('Circulación',[['go','Te pone en marcha: al empezar, tras un Stop y tras reparar.']])
+ +grp('Ataques',[['accident','Detiene al rival. Se arregla con Reparaciones.'],['gas','Detiene al rival. Se arregla con Gasolina.'],['flat','Detiene al rival. Se arregla con Rueda de recambio.'],['stop','Detiene al rival. Se quita con un Libre.'],['limit','El rival solo puede jugar 25 o 50 km. Se quita con Fin límite.']])
+ +grp('Reparaciones',[['repair','Arregla un Accidente. Después hace falta un Libre.'],['fuel','Arregla Sin gasolina. Después hace falta un Libre.'],['spare','Arregla un Pinchazo. Después hace falta un Libre.'],['endlimit','Quita el límite de velocidad.']])
+ +grp('Escudos',[['ace','Te protege de los Accidentes.'],['tank','Te protege de Sin gasolina.'],['punct','Te protege de los Pinchazos.'],['right','Te protege de Stop y Límite, y no necesitas Libre.']])
+ +`<p class="hn">Con el escudo en la mano, cuando te ataquen puedes hacer jugada maestra.</p>`}
+buildHelp();
 addEventListener('keydown',e=>{if(e.key==='Escape')help(0)});
 render();conn();
 </script></body></html>

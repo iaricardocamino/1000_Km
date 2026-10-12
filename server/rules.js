@@ -21,7 +21,7 @@ function newGame(first) {
   const deck = shuffle(buildDeck());
   const p = [newPlayer(), newPlayer()];
   for (let i = 0; i < 6; i++) { p[0].hand.push(deck.pop()); p[1].hand.push(deck.pop()); }
-  return { deck, discard: [], p, turn: first, phase: 'draw', lastHazard: null, over: false, winner: null, rev: 0, msg: '', shuf: 0, last: null };
+  return { deck, discard: [], p, turn: first, phase: 'draw', lastHazard: null, over: false, winner: null, rev: 0, msg: '', shuf: 0, last: null, coupDraw: false };
 }
 
 // Devuelve null si la carta es jugable, o el motivo por el que no.
@@ -34,7 +34,6 @@ function why(g, seat, card) {
     const v = +k.slice(1);
     if (me.status !== 'go') return me.status === 'start' ? 'Necesitas un semáforo verde para arrancar' : me.status === 'rep' ? 'Ya está reparado: juega un Libre (verde) antes de avanzar' : 'Estás detenido: repara primero';
     if (me.limit && v > 50) return 'Límite de velocidad: solo 25 o 50 km';
-    if (v === 200 && me.n200 >= 2) return 'Máximo dos cartas de 200 km';
     return null;
   }
   if (HAZ.includes(k)) {
@@ -86,20 +85,20 @@ function act(g, seat, type, cardId) {
     const c = coupCard(g, seat); if (!c || c.id !== cardId) return 'No puedes hacer jugada maestra';
     take(me, c.id); me.shields.push(c.k); me.sc.push(c); g.last = { n: g.rev + 1, seat, k: c.k, t: 'coup' };
     if (g.lastHazard.k === 'limit') me.limit = false; else me.status = 'go';
-    g.lastHazard = null; if (g.deck.length) me.hand.push(g.deck.pop());
-    g.msg = '¡Jugada maestra! Avería cancelada y turno extra'; g.rev++; return null;
+    g.lastHazard = null; g.coupDraw = g.deck.length > 0 || g.discard.length > 0; // la reposición la elige el jugador: mazo o descarte
+    g.msg = '¡Jugada maestra! Avería anulada: elige de dónde robar tu carta de reposición'; g.rev++; return null;
   }
   if (g.turn !== seat) return 'No es tu turno';
   if (type === 'drawdiscard') {
     if (g.phase !== 'draw') return 'Ya has robado';
     if (!g.discard.length) return 'El descarte está vacío';
-    g.lastHazard = null; g.msg = ''; const c = g.discard.pop(); me.hand.push(c); g.phase = 'play';
+    g.lastHazard = null; g.msg = ''; const c = g.discard.pop(); me.hand.push(c); g.phase = g.coupDraw ? 'draw' : 'play'; g.coupDraw = false;
     g.last = { n: g.rev + 1, seat, k: c.k, t: 'takediscard' }; g.rev++; return null;
   }
   if (type === 'draw') {
     if (g.phase !== 'draw') return 'Ya has robado';
     const sh = g.shuf; refill(g); if (!g.deck.length) return 'El mazo está vacío: coge del descarte';
-    g.lastHazard = null; if (g.shuf === sh) g.msg = ''; me.hand.push(g.deck.pop()); g.phase = 'play'; g.rev++; return null;
+    g.lastHazard = null; if (g.shuf === sh) g.msg = ''; me.hand.push(g.deck.pop()); g.phase = g.coupDraw ? 'draw' : 'play'; g.coupDraw = false; g.rev++; return null;
   }
   if (g.phase !== 'play') return 'Primero roba una carta';
   const card = me.hand.find(c => c.id === cardId); if (!card) return 'Esa carta no es tuya';
@@ -136,7 +135,7 @@ function view(g, seat) {
   const cc = coupCard(g, seat);
   return {
     rev: g.rev, turn: g.turn, phase: g.phase, over: g.over, winner: g.winner, msg: g.msg,
-    deck: g.deck.length, discard: g.discard.length, dtop: g.discard[g.discard.length - 1] || null, shuf: g.shuf, last: g.last, p: g.p.map(pub),
+    deck: g.deck.length, discard: g.discard.length, dtop: g.discard[g.discard.length - 1] || null, shuf: g.shuf, last: g.last, cd: g.coupDraw, p: g.p.map(pub),
     hand: me.hand, legal: Object.fromEntries(me.hand.map(c => [c.id, why(g, seat, c)])),
     coup: cc ? cc.id : null
   };

@@ -27,8 +27,8 @@ Alternativas equivalentes: Fly.io o Railway (mismo `npm start`; usan la variable
 - 106 cartas con la composición del PDF; 6 cartas por jugador; robar, jugar o descartar.
 - Se arranca con Semáforo verde (o Prioridad de paso). Tras reparar (reparaciones, gasolina o rueda) hace falta otro Libre, salvo con Vehículo prioritario.
 - Un bloqueo de conducción a la vez + límite de velocidad aparte. Averías solo contra rival en marcha (regla clásica).
-- Máximo dos 200 km; la carrera acaba al instante al llegar o superar 1.000 km.
-- Jugada maestra: tras recibir una avería, puedes jugar el escudo correspondiente **antes de robar en tu turno** (así el rival no ve tu mano); cancela la avería, repones carta y robas/juegas de nuevo. Decisión de diseño: no es en el mismo instante del ataque.
+- Sin límite de cartas de 200 km; la carrera acaba al instante al llegar o superar 1.000 km.
+- Jugada maestra: tras recibir una avería, puedes jugar el escudo correspondiente **antes de robar en tu turno** (así el rival no ve tu mano); cancela la avería, eliges de dónde robar la carta de reposición (mazo o descarte, sin robo automático) y luego haces tu turno normal. Decisión de diseño: no es en el mismo instante del ataque.
 - Al empezar el turno se roba del mazo o la última carta del descarte (variante pedida; no verificada contra las reglas originales). Esa carta superior del descarte no se baraja.
 - Fin de partida: Revancha, Volver al lobby o Salir (la sala se reorganiza si se va el creador). Colores fijos por asiento: rojo (creador) y azul.
 - Mazo agotado: se barajan descarte y cartas jugadas de nuevo, salvo la carta superior de los mazos de kilómetros, marcha y velocidad de cada jugador, los escudos en juego y las manos. Los kilómetros siguen contando aunque sus cartas se reciclen.
@@ -37,3 +37,6 @@ Alternativas equivalentes: Fly.io o Railway (mismo `npm start`; usan la variable
 ## Pendiente / simplificaciones
 - Las cartas son arte SVG propio inspirado en la edición clásica española; conviene retocarlas contra las fotos.
 - Las animaciones son sencillas y no hay pruebas automáticas de red; la sincronización hay que probarla con dos dispositivos reales.
+
+## Música de fondo
+Coloca tu archivo en `public/musica.mp3` (junto a `index.html`). El servidor lo sirve en `/musica.mp3` (`server/index.js`) y lo reproduce en bucle `public/index.html` (función `musicSync`), a volumen moderado, cuando estás en la partida y ya has pulsado o tocado algo (los navegadores no permiten empezar solos). El botón 🎵 de la esquina superior derecha la activa o desactiva y se recuerda entre visitas. Si el archivo no existe, el juego funciona igual y el botón queda atenuado.

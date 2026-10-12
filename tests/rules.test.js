@@ -7,8 +7,8 @@ test('límite de velocidad', () => {
   const g = mk([{ id: 900, k: 'd75' }, { id: 901, k: 'd50' }], { status: 'go', limit: true });
   assert.ok(R.act(g, 0, 'play', 900)); assert.equal(R.act(g, 0, 'play', 901), null); assert.equal(g.p[0].km, 50);
 });
-test('máximo dos 200 y se puede superar los 1000', () => {
-  const g = mk([{ id: 900, k: 'd200' }], { status: 'go', n200: 2 }); assert.ok(R.act(g, 0, 'play', 900));
+test('sin límite de cartas de 200 y se puede superar los 1000', () => {
+  const g = mk([{ id: 900, k: 'd200' }], { status: 'go', n200: 5 }); assert.equal(R.act(g, 0, 'play', 900), null); assert.equal(g.p[0].km, 200);
   const h = mk([{ id: 901, k: 'd50' }, { id: 902, k: 'd25' }], { status: 'go', km: 975 });
   assert.equal(R.act(h, 0, 'play', 901), null); assert.equal(h.winner, 0); assert.equal(h.p[0].km, 1025); assert.equal(h.over, true);
 });
@@ -19,7 +19,7 @@ test('pinchazo bloquea al rival', () => {
 test('jugada maestra', () => {
   const g = mk([{ id: 900, k: 'flat' }]); g.p[1].status = 'go'; g.p[1].hand = [{ id: 950, k: 'punct' }];
   R.act(g, 0, 'play', 900); assert.equal(R.coupCard(g, 1).id, 950);
-  assert.equal(R.act(g, 1, 'coup', 950), null); assert.equal(g.p[1].status, 'go'); assert.equal(g.turn, 1); assert.equal(g.phase, 'draw');
+  assert.equal(R.act(g, 1, 'coup', 950), null); assert.equal(g.p[1].status, 'go'); assert.equal(g.turn, 1); assert.equal(g.phase, 'draw'); assert.equal(g.p[1].hand.length, 0); assert.equal(g.coupDraw, true);
   assert.ok(R.act(g, 1, 'coup', 950));
 });
 test('la vista no revela la mano rival', () => { const v = R.view(R.newGame(0), 0); assert.equal(v.p[1].hand, 6); assert.equal(v.deck, 94); assert.ok(!('deckOrder' in v)); });
@@ -65,4 +65,15 @@ test('simulación: sin cartas duplicadas ni perdidas', () => {
       assert.equal(all.length, 106); assert.equal(new Set(all.map(c => c.id)).size, 106);
     }
   }
+});
+test('jugada maestra: sin robo automático, reposición elegida y luego turno normal', () => {
+  const g = mk([{ id: 900, k: 'flat' }]); g.p[1].status = 'go'; g.p[1].hand = [{ id: 950, k: 'punct' }];
+  g.discard = [{ id: 999, k: 'd25' }]; R.act(g, 0, 'play', 900); const n = g.deck.length;
+  assert.equal(R.act(g, 1, 'coup', 950), null); assert.equal(g.deck.length, n); assert.equal(g.p[1].hand.length, 0);
+  assert.ok(R.act(g, 0, 'draw')); assert.ok(R.act(g, 0, 'drawdiscard')); // el rival no puede interferir
+  assert.ok(R.act(g, 1, 'discard', 1)); // sin robar antes no se puede jugar
+  assert.equal(R.act(g, 1, 'drawdiscard'), null); assert.equal(g.p[1].hand.length, 1); assert.equal(g.phase, 'draw'); assert.equal(g.deck.length, n);
+  assert.ok(R.act(g, 1, 'drawdiscard')); // el descarte ya está vacío
+  assert.equal(R.act(g, 1, 'draw'), null); assert.equal(g.p[1].hand.length, 2); assert.equal(g.phase, 'play'); assert.equal(g.deck.length, n - 1);
+  assert.ok(R.act(g, 1, 'draw')); // el robo solo ocurre una vez
 });
