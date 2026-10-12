@@ -23,3 +23,10 @@ test('jugada maestra', () => {
   assert.ok(R.act(g, 1, 'coup', 950));
 });
 test('la vista no revela la mano rival', () => { const v = R.view(R.newGame(0), 0); assert.equal(v.p[1].hand, 6); assert.equal(v.deck, 94); assert.ok(!('deckOrder' in v)); });
+test('mazo agotado: se rebaraja salvo cartas superiores y manos', () => {
+  const g = mk([{ id: 900, k: 'd25' }, { id: 901, k: 'd50' }], { status: 'go' }); g.deck = [];
+  g.discard = [{ id: 1, k: 'd25' }]; g.p[0].pk = [{ id: 2, k: 'd25' }, { id: 3, k: 'd25' }]; g.p[1].sc = [{ id: 4, k: 'ace' }];
+  assert.equal(R.act(g, 0, 'discard', 900), null);
+  assert.equal(g.shuf, 1); assert.equal(g.deck.length, 3); assert.equal(g.p[0].pk.length, 1); assert.equal(g.p[0].pk[0].id, 3);
+  assert.equal(g.p[1].sc.length, 1); assert.equal(g.p[0].hand.length, 1); assert.equal(g.phase, 'draw');
+});

@@ -15,13 +15,13 @@ function buildDeck() {
   return d;
 }
 function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = crypto.randomInt(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; }
-const newPlayer = () => ({ km: 0, status: 'start', limit: false, shields: [], n200: 0, hand: [] });
+const newPlayer = () => ({ km: 0, status: 'start', limit: false, shields: [], n200: 0, hand: [], pk: [], pd: [], ps: [], sc: [] });
 
 function newGame(first) {
   const deck = shuffle(buildDeck());
   const p = [newPlayer(), newPlayer()];
   for (let i = 0; i < 6; i++) { p[0].hand.push(deck.pop()); p[1].hand.push(deck.pop()); }
-  return { deck, discard: [], p, turn: first, phase: 'draw', lastHazard: null, over: false, winner: null, rev: 0, msg: '' };
+  return { deck, discard: [], p, turn: first, phase: 'draw', lastHazard: null, over: false, winner: null, rev: 0, msg: '', shuf: 0, last: null };
 }
 
 // Devuelve null si la carta es jugable, o el motivo por el que no.
@@ -58,7 +58,17 @@ function coupCard(g, seat) {
   return me.hand.find(c => c.k === SHIELD_OF[h.k]) || null;
 }
 
+// Mazo agotado: se barajan descarte y cartas jugadas, salvo la carta superior de los mazos
+// de kilómetros, marcha y velocidad de cada jugador, los escudos en juego y las manos.
+function refill(g) {
+  if (g.deck.length) return;
+  const pool = g.discard.splice(0);
+  for (const p of g.p) for (const z of ['pk', 'pd', 'ps']) { const top = p[z].pop(); pool.push(...p[z]); p[z] = top ? [top] : []; }
+  if (!pool.length) return;
+  g.deck = shuffle(pool); g.shuf++; g.msg = 'Se acabó el mazo: barajando las cartas jugadas…';
+}
 function endTurn(g, seat) {
+  refill(g);
   g.turn = 1 - seat; g.phase = g.deck.length ? 'draw' : 'play';
   if (!g.deck.length) { // mazo agotado: se sigue sin robar hasta quedarse sin cartas
     if (!g.p[g.turn].hand.length) g.turn = seat;
@@ -75,7 +85,7 @@ function act(g, seat, type, cardId) {
   const me = g.p[seat], rv = g.p[1 - seat];
   if (type === 'coup') {
     const c = coupCard(g, seat); if (!c || c.id !== cardId) return 'No puedes hacer jugada maestra';
-    take(me, c.id); me.shields.push(c.k);
+    take(me, c.id); me.shields.push(c.k); me.sc.push(c); g.last = { n: g.rev + 1, seat, k: c.k, t: 'coup' };
     if (g.lastHazard.k === 'limit') me.limit = false; else me.status = 'go';
     g.lastHazard = null; if (g.deck.length) me.hand.push(g.deck.pop());
     g.msg = '¡Jugada maestra! Avería cancelada y turno extra'; g.rev++; return null;
@@ -83,7 +93,7 @@ function act(g, seat, type, cardId) {
   if (g.turn !== seat) return 'No es tu turno';
   if (type === 'draw') {
     if (g.phase !== 'draw') return 'Ya has robado';
-    g.lastHazard = null; me.hand.push(g.deck.pop()); g.phase = 'play'; g.msg = ''; g.rev++; return null;
+    g.lastHazard = null; refill(g); if (g.deck.length) me.hand.push(g.deck.pop()); else g.msg = 'No quedan cartas para robar'; g.phase = 'play'; g.rev++; return null;
   }
   if (g.phase !== 'play') return 'Primero roba una carta';
   const card = me.hand.find(c => c.id === cardId); if (!card) return 'Esa carta no es tuya';
@@ -93,19 +103,20 @@ function act(g, seat, type, cardId) {
     const r = why(g, seat, card); if (r) return r;
     take(me, cardId); const k = card.k;
     if (k[0] === 'd') {
-      const v = +k.slice(1); me.km += v; if (v === 200) me.n200++;
+      const v = +k.slice(1); me.km += v; me.pk.push(card); if (v === 200) me.n200++;
       if (me.km === 1000) { g.over = true; g.winner = seat; }
     } else if (HAZ.includes(k)) {
-      if (k === 'limit') rv.limit = true; else rv.status = k;
+      if (k === 'limit') { rv.limit = true; rv.ps.push(card); } else { rv.status = k; rv.pd.push(card); }
       g.lastHazard = { victim: 1 - seat, k };
-    } else if (k === 'go' || REMEDY_OF[k]) { me.status = 'go'; g.discard.push(card); }
-    else if (k === 'endlimit') { me.limit = false; g.discard.push(card); }
+    } else if (k === 'go' || REMEDY_OF[k]) { me.status = 'go'; me.pd.push(card); }
+    else if (k === 'endlimit') { me.limit = false; me.ps.push(card); }
     else { // escudo: protege y retira la avería asociada si ya estaba activa
-      me.shields.push(k);
+      me.shields.push(k); me.sc.push(card);
       if (k === 'right') { if (['start', 'stop'].includes(me.status)) me.status = 'go'; me.limit = false; }
       else if (me.status === SHIELD_CURES[k]) me.status = 'go';
     }
   } else return 'Comando desconocido';
+  g.last = { n: g.rev + 1, seat, k: card.k, t: type };
   g.rev++;
   if (!g.over) endTurn(g, seat);
   return null;
@@ -114,11 +125,11 @@ function act(g, seat, type, cardId) {
 // Vista privada: solo la mano propia, nunca el orden del mazo.
 function view(g, seat) {
   const me = g.p[seat];
-  const pub = p => ({ km: p.km, status: p.status, limit: p.limit, shields: p.shields, n200: p.n200, hand: p.hand.length });
+  const pub = p => ({ km: p.km, status: p.status, limit: p.limit, shields: p.shields, n200: p.n200, hand: p.hand.length, pk: p.pk.slice(-4), pd: p.pd.slice(-3), ps: p.ps.slice(-1), sc: p.sc });
   const cc = coupCard(g, seat);
   return {
     rev: g.rev, turn: g.turn, phase: g.phase, over: g.over, winner: g.winner, msg: g.msg,
-    deck: g.deck.length, discard: g.discard.length, p: g.p.map(pub),
+    deck: g.deck.length, discard: g.discard.length, dtop: g.discard[g.discard.length - 1] || null, shuf: g.shuf, last: g.last, p: g.p.map(pub),
     hand: me.hand, legal: Object.fromEntries(me.hand.map(c => [c.id, why(g, seat, c)])),
     coup: cc ? cc.id : null
   };
